@@ -153,11 +153,9 @@ sub _expire_pastes {
         my $sth_exp = $dbh->prepare($r_expired);
         $sth_exp->execute($file);
         my $ex = $sth_exp->fetchrow_hashref; 
-        debug $ex;
         if (-f "$dir/$ex->{'file'}") { 
             # If there's a file and no DB entry delete it too.
             if (!$ex->{'expires'} || $now >= $ex->{'expires'}) {
-                debug;
                 unlink "$dir/$file" || debug "Couldn't Remove $file: $!";
             }
         }
