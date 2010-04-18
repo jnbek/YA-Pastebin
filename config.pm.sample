@@ -1,0 +1,18 @@
+package config;
+# Copy me as config.pm and configure to to your system.
+use strict;
+use warnings;
+
+
+sub config { 
+    my $cfg  = {
+        dbname       => 'ya-pastebin',
+        dbuser       => 'ya-pastebin',
+        dbpass       => 'password',
+        dbhost       => 'localhost',
+        dbport       => 3306,
+        base_path    => '/path/to/ya-pastebin',
+        storage_path => 'pastes',        # No /'s
+    };
+    return $cfg;
+}

@@ -1,0 +1,25 @@
+ya-pastebin: Yet Another Pastebin.
+A CGI::Ex driven pastebin designed for collaboration and code sharing. 
+* Prequisites:
+
+    CGI::Ex
+    Template::Alloy
+    Digest::SHA
+    Syntax::Highlight::Engine::Kate (Bundled)
+    Any dependencies required by the above packages and their dependencies....
+    Under FreeBSD use:
+
+        portinstall p5-CGI-Ex
+
+    Under Arch Linux use:
+
+        yaourt -Sy perl-cgi-ex
+
+    to install the required packages.
+
+* Installation:
+
+     make install
+
+     vim Config/Settings.pm
+

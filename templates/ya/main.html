@@ -1,0 +1,101 @@
+[% PROCESS 'ya/head.html' %]
+[% IF debug %]
+<pre>
+[% debug %]
+</pre>
+[% END %]
+<body>
+
+   <!-- Begin Wrapper -->
+   <div id="wrapper">
+   
+       <!-- Begin Header -->
+
+     <div id="header">
+          <h1>YA::Pastebin</h1>
+          <h2> No Paste, The CGI::Ex Way</h2>
+     </div>
+     <!-- End Header -->
+     <!-- Begin Left Column -->
+     <div id="leftcolumn">
+     <span class="general_error id="general_error">[% general_error %]</span>
+
+       <form name="[% form_name %]" method="post">
+       <table id="main_form">
+        <tr>
+          <td>
+            <label for="filename"> Name: </label>
+          </td>
+          <td>
+            <input type="text" name="filename" />
+          </td>
+          <td>
+            <label for="language"> Language: </label>
+          </td>
+          <td>
+            <select name="language">
+              [%- FOR l in langs %]
+              <option value="[% l.value.0 %]">[% l.key %]</option>
+              [%- END %]
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>
+          <!--label for="password"> Password (Optional): </label-->&nbsp;
+          </td>
+          <td>
+          <!--input type="password" name="password" /-->&nbsp;
+          </td>
+          <td>
+          <label for="expires"> Expires: </label>
+          </td>
+          <td>
+          <select name="expires">
+            <option value="600">10 Minutes</option>
+            <option value="3600">1 Hour</option>
+            <option value="86400">24 Hours</option>
+            <option value="864000">10 Days</option>
+            [%- IF can_forever %]
+            <option value="never">Never</option>
+            [%- END %]
+          </select>
+        </td>
+       </tr>
+     </table>
+      [%- IF code %]
+      <div id="dialog"><p style="background-color: #eeeeee;">[% hl_code %]</p></div>
+      [%- END %]
+      <label for="the_code"> Code: </label><br />
+      <textarea name="the_code" cols="80" rows="40">[% code %]</textarea>
+      <br />
+      <input type="submit" name="submit" />
+    </form>
+    </div>
+     <!-- End Left Column -->
+
+     
+     <!-- Begin Right Column -->
+     <div id="rightcolumn">
+           
+        <h3>Recent Pastes</h3>
+        <ul>
+          [%- FOR r in recent_pastes %]
+          <li>[% r.date %] [% r.name %]</li>
+          [%-END %]
+     </div>
+     <!-- End Right Column -->
+     
+     <!-- Begin Footer -->
+     <div id="footer">
+         <p><small>YA::Pastebin: <a href="http://github.com/jnbek">http://github.com/jnbek</a></small></p>
+       </div>
+     <!-- End Footer -->
+
+     
+   </div>
+   <!-- End Wrapper -->
+[% js_validation %]   
+</body>
+</html>
+
