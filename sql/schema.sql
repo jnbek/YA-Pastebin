@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `pastes` (
   `user` varchar(25) collate utf8_unicode_ci NOT NULL default 'Anonymous',
   `paste_password` varchar(128) collate utf8_unicode_ci default NULL,
   `date` int(12) unsigned NOT NULL,
-  `hash_id` varchar(128) collate utf8_unicode_ci NOT NULL,
+  `hash_id` varchar(40) collate utf8_unicode_ci NOT NULL,
   `file` varchar(254) collate utf8_unicode_ci NOT NULL,
   `expires` int(12) unsigned NOT NULL,
   PRIMARY KEY  (`id`)

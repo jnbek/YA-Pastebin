@@ -5,6 +5,7 @@ A CGI::Ex driven pastebin designed for collaboration and code sharing.
     CGI::Ex
     Template::Alloy
     Digest::SHA
+    Time::HiRes (clock_gettime)
     Syntax::Highlight::Engine::Kate (Bundled)
     Any dependencies required by the above packages and their dependencies....
     Under FreeBSD use:

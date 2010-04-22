@@ -30,7 +30,7 @@ sub main_hash_swap {
     my $f    = $self->form;
     my $dbh  = $self->_dbh;
     $self->_expire_pastes;
-    my ($paste,$the_code);
+    my ($paste, $the_code);
     if ($f->{'p'}) {
         $paste = $self->_get_paste($f->{'p'});
     }
@@ -46,18 +46,18 @@ sub main_hash_swap {
     @langs = sort(@langs);
 
     my $sb_sql = $self->_query_db('recent_pastes');
-    my $sth = $dbh->prepare($sb_sql);
+    my $sth    = $dbh->prepare($sb_sql);
     $sth->execute;
     while (my $row = $sth->fetchrow_hashref) {
         my $rd = $self->_unix2date($row->{'date'});
         $row->{'date'} = $rd->{'date'};
-        my $exp_h = $self->_unix2date($row->{'expires'});
-        my $expires = $exp_h->{'date'}.' '.$exp_h->{'time'};
+        my $exp_h   = $self->_unix2date($row->{'expires'});
+        my $expires = $exp_h->{'date'} . ' ' . $exp_h->{'time'};
         $row->{'expires'} = $expires;
         push @recent_pastes, $row;
     }
     if ($paste->{'code'} && $paste->{'filetype'}) {
-        $the_code = $self->_hl_file($paste->{'code'},$paste->{'filetype'});
+        $the_code = $self->_hl_file($paste->{'code'}, $paste->{'filetype'});
     }
     else {
         $the_code = "<h3>This paste has expired and no longer exists.</h3>";
@@ -93,10 +93,12 @@ sub main_finalize {
     my $self = shift;
     my $f    = $self->form;
     my $t    = time;
+    use Time::HiRes qw(clock_gettime);
+    my $ms   = clock_gettime();
     my $sql  = $self->_query_db('insert');
     my $dbh  = $self->_dbh;
-    use Digest::SHA qw(sha512_hex);
-    my $hash_id = sha512_hex($t);
+    use Digest::SHA qw(sha1_hex sha512_hex);
+    my $hash_id = sha1_hex($ms); #Use Millisecs for more precision.
 
     # In case user has JS off dbl check filename.
     if (!$f->{'filename'} || length($f->{'filename'}) > 254) {
@@ -109,8 +111,11 @@ sub main_finalize {
     }
     my $expires = $t + $f->{'expires'};
     my $sth     = $dbh->prepare($sql);
-    my $user; #TODO: Decide if we're going to do logins
-    eval { $sth->execute($f->{'language'}, $user,$paste_password, $t, $hash_id, $f->{'filename'}, $expires); };
+    my $user;    #TODO: Decide if we're going to do logins
+    eval {
+        $sth->execute($f->{'language'}, $user, $paste_password, $t, $hash_id, $f->{'filename'},
+            $expires);
+    };
     if ($@) {
         $self->add_to_errors({general_error => $DBI::errstr});
         debug $DBI::errstr;
@@ -125,22 +130,24 @@ sub main_finalize {
 }
 
 sub success_run_step {
-    my $self= shift;
+    my $self = shift;
     $self->goto_step('main');
     return 1;
 }
+
 sub _get_paste {
     my $self = shift;
     my $p    = shift;
     my $sql  = $self->_query_db('get_paste');
     my $dbh  = $self->_dbh;
-    my $cfg = $self->_config;
-    my $dir = qq{$cfg->{'base_path'}/$cfg->{'storage_path'}};
+    my $cfg  = $self->_config;
+    my $dir  = qq{$cfg->{'base_path'}/$cfg->{'storage_path'}};
     my $sth  = $dbh->prepare($sql);
     $sth->execute($p);
     my $paste = $sth->fetchrow_hashref;
     $sth = undef;
     $dbh->disconnect;
+
     if ($paste->{'file'}) {
         $paste->{'code'} = do { local (@ARGV, $/) = qq{$dir/$paste->{'file'}}; <> };
     }
@@ -157,23 +164,25 @@ sub _expire_pastes {
     my $cfg  = $self->_config;
     my $now  = time;
     my $dir  = qq{$cfg->{'base_path'}/$cfg->{'storage_path'}};
+
     #delete the actualy filename
     opendir(my $dh, $dir) || debug "Can't open $dir: $!";
-    while(my $file = readdir($dh)) {
-        next if $file =~ m/^\./; 
-        my @stat = stat("$dir/$file");
+    while (my $file = readdir($dh)) {
+        next if $file =~ m/^\./;
+        my @stat      = stat("$dir/$file");
         my $r_expired = $self->_query_db('r_expired');
-        my $sth_exp = $dbh->prepare($r_expired);
+        my $sth_exp   = $dbh->prepare($r_expired);
         $sth_exp->execute($file);
-        my $ex = $sth_exp->fetchrow_hashref; 
-        if (-f "$dir/$ex->{'file'}") { 
+        my $ex = $sth_exp->fetchrow_hashref;
+        if (-f "$dir/$ex->{'file'}") {
+
             # If there's a file and no DB entry delete it too.
             if (!$ex->{'expires'} || $now >= $ex->{'expires'}) {
                 unlink "$dir/$file" || debug "Couldn't Remove $file: $!";
             }
         }
         $sth_exp = undef;
-        
+
     }
     closedir $dh;
     my $sth = $dbh->prepare($sql);
@@ -204,16 +213,18 @@ sub _dbh {
     my $dbhost = $cfg->{'dbhost'};
     my $dbport = $cfg->{'dbport'};
     my $dsn    = "dbi:mysql:database=$dbname;host=$dbhost;port=$dbport";
-    my $dbh    = DBI->connect($dsn, $dbuser, $dbpass, {RaiseError => 1, AutoCommit => 1}) || debug $DBI::errstr;
+    my $dbh    = DBI->connect($dsn, $dbuser, $dbpass, {RaiseError => 1, AutoCommit => 1})
+      || debug $DBI::errstr;
     return $dbh;
 }
 
 sub _query_db {
-    my $self = shift;
-    my $q    = shift;
+    my $self          = shift;
+    my $q             = shift;
     my @pastes_schema = qw( filetype user paste_password date hash_id file expires );
-    my $sql  = {
-        insert        => 'INSERT INTO pastes ( filetype, user, paste_password, date, hash_id, file, expires ) VALUES (?,?,?,?,?,?,?)',
+    my $sql           = {
+        insert =>
+          'INSERT INTO pastes ( filetype, user, paste_password, date, hash_id, file, expires ) VALUES (?,?,?,?,?,?,?)',
         get_paste     => 'SELECT * FROM pastes WHERE hash_id = ?',
         recent_pastes => 'SELECT * FROM pastes ORDER BY date DESC LIMIT 10',
         users         => 'SELECT * FROM users',
@@ -224,13 +235,13 @@ sub _query_db {
 }
 
 sub _save_file {
-    my	$self = shift;
-    my $file = shift;
-    my $code = shift;
-    my $cfg = $self->_config;
+    my $self      = shift;
+    my $file      = shift;
+    my $code      = shift;
+    my $cfg       = $self->_config;
     my $directory = qq{$cfg->{'base_path'}/$cfg->{'storage_path'}};
-    debug "$directory doesn't exist. Please create it and continue" if ! -e $directory;
-    debug "$directory isn't writable. Please correct this problem." if ! -w $directory;
+    debug "$directory doesn't exist. Please create it and continue" if !-e $directory;
+    debug "$directory isn't writable. Please correct this problem." if !-w $directory;
     open my $FH, '>', "$directory/$file" || debug "Failed to open $directory/$file: $!";
     print $FH $code;
     close($FH);
@@ -241,11 +252,11 @@ sub _save_file {
 
 sub _unix2date {
     my $self = shift;
-    my $unix = shift; #UNIX Epoch
-    my $h = {};
-    my @months = ("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec");
-    my ($sec, $min, $hour, $day,$month,$year) = (localtime($unix))[0,1,2,3,4,5,6];
-    my $date = "$day-$months[$month]-".($year+1900);
+    my $unix = shift;    #UNIX Epoch
+    my $h    = {};
+    my @months = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+    my ($sec, $min, $hour, $day, $month, $year) = (localtime($unix))[0, 1, 2, 3, 4, 5, 6];
+    my $date = "$day-$months[$month]-" . ($year + 1900);
     my $time = "$hour:$min:$sec";
     $h->{'date'} = $date;
     $h->{'time'} = $time;
