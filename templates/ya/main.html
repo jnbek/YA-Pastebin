@@ -81,7 +81,11 @@
         <h3>Recent Pastes</h3>
         <ul>
           [%- FOR r in recent_pastes %]
-          <li>[% r.date %] [% r.name %]</li>
+          <li>
+          Posted: [% r.date %]<br />
+          [% r.filetype %]: <a href="?p=[% r.hash_id %]">[% r.file %]</a><br />
+          Expires: [% r.expires %]<br />
+          </li>
           [%-END %]
      </div>
      <!-- End Right Column -->

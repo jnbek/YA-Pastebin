@@ -7,7 +7,7 @@ package Ya::Pastebin;
 #  DESCRIPTION:  Yet Another Pastebin CGI-Ex style!!
 #
 #       AUTHOR:  John D Jones III (jnbek at yahoo dot com),
-#      VERSION:  1.0
+#      VERSION:  0.2
 #      CREATED:  03/29/2010 03:55:56 PM
 #===============================================================================
 
@@ -21,7 +21,7 @@ use Syntax::Highlight::Engine::Kate;
 use DBI;
 use Data::Dumper;
 
-our $version = '0.1';
+our $version = '0.2';
 sub template_path {'./templates'}
 
 #sub post_navigate { debug shift->dump_history; }
@@ -37,13 +37,25 @@ sub main_hash_swap {
     my $cfg = $self->_config;
     my $hl  = new Syntax::Highlight::Engine::Kate();
     my $ext = $hl->extensions;
-    my (@langs, @ph);
+    my (@langs, @ph, @recent_pastes);
     foreach my $l (keys %$ext) {
         @ph = split(/\./, $l);
         next if (!$ph[1] || $ph[1] eq '*');
         push @langs, $ph[1];
     }
     @langs = sort(@langs);
+
+    my $sb_sql = $self->_query_db('recent_pastes');
+    my $sth = $dbh->prepare($sb_sql);
+    $sth->execute;
+    while (my $row = $sth->fetchrow_hashref) {
+        my $rd = $self->_unix2date($row->{'date'});
+        $row->{'date'} = $rd->{'date'};
+        my $exp_h = $self->_unix2date($row->{'expires'});
+        my $expires = $exp_h->{'date'}.' '.$exp_h->{'time'};
+        $row->{'expires'} = $expires;
+        push @recent_pastes, $row;
+    }
     if ($paste->{'code'} && $paste->{'filetype'}) {
         $the_code = $self->_hl_file($paste->{'code'},$paste->{'filetype'});
     }
@@ -51,9 +63,10 @@ sub main_hash_swap {
         $the_code = "<h3>This paste has expired and no longer exists.</h3>";
     }
     return {
-        langs   => $ext,
-        code    => $paste->{'code'},
-        hl_code => $the_code,
+        langs         => $ext,
+        recent_pastes => \@recent_pastes,
+        code          => $paste->{'code'},
+        hl_code       => $the_code,
     };
 }
 
@@ -224,6 +237,21 @@ sub _save_file {
 
     return 1;
 }
+
+
+sub _unix2date {
+    my $self = shift;
+    my $unix = shift; #UNIX Epoch
+    my $h = {};
+    my @months = ("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec");
+    my ($sec, $min, $hour, $day,$month,$year) = (localtime($unix))[0,1,2,3,4,5,6];
+    my $date = "$day-$months[$month]-".($year+1900);
+    my $time = "$hour:$min:$sec";
+    $h->{'date'} = $date;
+    $h->{'time'} = $time;
+    return $h;
+}
+
 sub _hl_file {
     my $self = shift;
     my ($file, $type) = @_;
