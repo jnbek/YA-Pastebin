@@ -67,6 +67,7 @@ sub main_hash_swap {
         recent_pastes => \@recent_pastes,
         code          => $paste->{'code'},
         hl_code       => $the_code,
+        filename      => $paste->{'file'},
     };
 }
 
@@ -274,7 +275,7 @@ sub _hl_file {
             "&"  => "&amp;",
             " "  => "&nbsp;",
             "\t" => "&nbsp;&nbsp;&nbsp;&nbsp;",
-            "\n" => "<br />\n",
+            "\n" => "",
         },
         format_table => {
             Alert        => ["<span class='alert'>",        "</span>"],

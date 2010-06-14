@@ -18,7 +18,7 @@
      <!-- End Header -->
      <!-- Begin Left Column -->
      <div id="leftcolumn">
-     <span class="general_error id="general_error">[% general_error %]</span>
+     <span class="general_error" id="general_error">[% general_error %]</span>
 
        <form name="[% form_name %]" method="post">
        <table id="main_form">
@@ -64,7 +64,15 @@
        </tr>
      </table>
       [%- IF code %]
-      <div id="dialog"><p style="background-color: #eeeeee;">[% hl_code %]</p></div>
+      <p><a rel="ibox&fullscreen=true" href="#inner_content">View Highlighted Code</a></p>
+      <div id="inner_content" style="display:none;">
+        <div style="background:#eeeeee;border:1px dashed #aaaaaa;padding:15px;margin:15px;">
+          <pre>[% hl_code %]</pre>
+        </div>
+      </div>
+      <script type="text/javascript">
+        iBox.showURL('#inner_content');
+      </script>
       [%- END %]
       <label for="the_code"> Code: </label><br />
       <textarea name="the_code" cols="80" rows="40">[% code %]</textarea>
