@@ -21,7 +21,7 @@ use Syntax::Highlight::Engine::Kate;
 use DBI;
 use Data::Dumper;
 
-our $version = '0.2';
+our $version = '0.5';
 sub template_path {'./templates'}
 
 #sub post_navigate { debug shift->dump_history; }
@@ -37,6 +37,7 @@ sub main_hash_swap {
     my $cfg = $self->_config;
     my $hl  = new Syntax::Highlight::Engine::Kate();
     my $ext = $hl->extensions;
+    #debug $ext; #TODO: make this work better.
     my (@langs, @ph, @recent_pastes);
     foreach my $l (keys %$ext) {
         @ph = split(/\./, $l);
@@ -68,6 +69,7 @@ sub main_hash_swap {
         code          => $paste->{'code'},
         hl_code       => $the_code,
         filename      => $paste->{'file'},
+        language      => $paste->{'filetype'},
     };
 }
 

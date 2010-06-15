@@ -27,7 +27,7 @@
             <label for="filename"> Name: </label>
           </td>
           <td>
-            <input type="text" name="filename" />
+            <input type="text" name="filename" value="[% filename %]" />
           </td>
           <td>
             <label for="language"> Language: </label>
@@ -35,7 +35,7 @@
           <td>
             <select name="language">
               [%- FOR l in langs %]
-              <option value="[% l.value.0 %]">[% l.key %]</option>
+              <option value="[% l.value.0 %]" [% l.value.0 == language ? 'selected="selected"' : '' %]>[% l.value.0 %]: [% l.key %]</option>
               [%- END %]
             </select>
           </td>
@@ -52,10 +52,11 @@
           </td>
           <td>
           <select name="expires">
-            <option value="600">10 Minutes</option>
+            <option value="1200">20 Minutes</option>
             <option value="3600">1 Hour</option>
-            <option value="86400">24 Hours</option>
-            <option value="864000">10 Days</option>
+            <option value="86400" selected="selected">24 Hours</option>
+            <option value="604800">7 Days</option>
+            <option value="1209600">14 Days</option>
             [%- IF can_forever %]
             <option value="never">Never</option>
             [%- END %]
@@ -67,6 +68,8 @@
       <p><a rel="ibox&fullscreen=true" href="#inner_content">View Highlighted Code</a></p>
       <div id="inner_content" style="display:none;">
         <div style="background:#eeeeee;border:1px dashed #aaaaaa;padding:15px;margin:15px;">
+          <h3>[% filename %] </h3>
+          <h4>[% language %]</h4>
           <pre>[% hl_code %]</pre>
         </div>
       </div>
