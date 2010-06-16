@@ -44,7 +44,6 @@ sub main_hash_swap {
     }
     my @langs = keys %{{ map { $_ => 1 } @e }};
     @langs = sort(@langs);
-    debug \@langs;
 
     my $sb_sql = $self->_query_db('recent_pastes');
     my $sth    = $dbh->prepare($sb_sql);
