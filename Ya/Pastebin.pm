@@ -21,7 +21,7 @@ use Syntax::Highlight::Engine::Kate;
 use DBI;
 use Data::Dumper;
 
-our $version = '0.5';
+our $version = '0.7-BETA';
 sub template_path {'./templates'}
 
 #sub post_navigate { debug shift->dump_history; }
@@ -69,6 +69,9 @@ sub main_hash_swap {
         hl_code       => $the_code,
         filename      => $paste->{'file'},
         language      => $paste->{'filetype'},
+        version       => $version,
+        site_name     => $cfg->{'site_name'},
+        site_slogan   => $cfg->{'site_slogan'},
     };
 }
 

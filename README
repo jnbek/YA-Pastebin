@@ -20,7 +20,6 @@ A CGI::Ex driven pastebin designed for collaboration and code sharing.
 
 * Installation:
 
-     make install
-
+     cd ya-pastebin/
      vim config.pm
 

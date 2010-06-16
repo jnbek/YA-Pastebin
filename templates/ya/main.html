@@ -12,14 +12,12 @@
        <!-- Begin Header -->
 
      <div id="header">
-          <h1>YA::Pastebin</h1>
-          <h2> No Paste, The CGI::Ex Way</h2>
+          <h1>[% site_name %]</h1>
+          <h2>[% site_slogan %]</h2>
      </div>
      <!-- End Header -->
      <!-- Begin Left Column -->
      <div id="leftcolumn">
-     <span class="general_error" id="general_error">[% general_error %]</span>
-
        <form name="[% form_name %]" method="post">
        <table id="main_form">
         <tr>
@@ -68,8 +66,6 @@
       <p><a rel="ibox&fullscreen=true" href="#inner_content">View Highlighted Code</a></p>
       <div id="inner_content" style="display:none;">
         <div style="background:#eeeeee;border:1px dashed #aaaaaa;padding:15px;margin:15px;">
-          <h3>[% filename %] </h3>
-          <h4>[% language %]</h4>
           <pre>[% hl_code %]</pre>
         </div>
       </div>
@@ -103,7 +99,7 @@
      
      <!-- Begin Footer -->
      <div id="footer">
-         <p><small>YA::Pastebin: <a href="http://github.com/jnbek">http://github.com/jnbek</a></small></p>
+         <p><small>YA::Pastebin [% version %]: <a href="http://github.com/jnbek">http://github.com/jnbek</a></small></p>
        </div>
      <!-- End Footer -->
 

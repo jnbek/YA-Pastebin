@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS `pastes`;
 CREATE TABLE IF NOT EXISTS `pastes` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `filetype` varchar(25) collate utf8_unicode_ci NOT NULL,
-  `user` varchar(25) collate utf8_unicode_ci NOT NULL default 'Anonymous',
+  `user` varchar(25) collate utf8_unicode_ci default NULL,
   `paste_password` varchar(128) collate utf8_unicode_ci default NULL,
   `date` int(12) unsigned NOT NULL,
   `hash_id` varchar(40) collate utf8_unicode_ci NOT NULL,

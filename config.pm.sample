@@ -6,6 +6,8 @@ use warnings;
 
 sub config { 
     my $cfg  = {
+        site_name    => 'YA::Pastebin',
+        site_slogan  => 'No Paste, The CGI::Ex Way',
         dbname       => 'ya-pastebin',
         dbuser       => 'ya-pastebin',
         dbpass       => 'password',
