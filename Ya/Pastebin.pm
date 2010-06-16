@@ -38,13 +38,13 @@ sub main_hash_swap {
     my $hl  = new Syntax::Highlight::Engine::Kate();
     my $ext = $hl->extensions;
     #debug $ext; #TODO: make this work better.
-    my (@langs, @ph, @recent_pastes);
-    foreach my $l (keys %$ext) {
-        @ph = split(/\./, $l);
-        next if (!$ph[1] || $ph[1] eq '*');
-        push @langs, $ph[1];
+    my (@e, @ph, @recent_pastes);
+    foreach my $l (values %$ext) {
+        push @e, @$l;
     }
+    my @langs = keys %{{ map { $_ => 1 } @e }};
     @langs = sort(@langs);
+    debug \@langs;
 
     my $sb_sql = $self->_query_db('recent_pastes');
     my $sth    = $dbh->prepare($sb_sql);
@@ -64,7 +64,7 @@ sub main_hash_swap {
         $the_code = "<h3>This paste has expired and no longer exists.</h3>";
     }
     return {
-        langs         => $ext,
+        langs         => \@langs,
         recent_pastes => \@recent_pastes,
         code          => $paste->{'code'},
         hl_code       => $the_code,

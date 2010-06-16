@@ -35,7 +35,7 @@
           <td>
             <select name="language">
               [%- FOR l in langs %]
-              <option value="[% l.value.0 %]" [% l.value.0 == language ? 'selected="selected"' : '' %]>[% l.value.0 %]: [% l.key %]</option>
+              <option value="[% l%]" [% l == language ? 'selected="selected"' : '' %]>[% l %]</option>
               [%- END %]
             </select>
           </td>
