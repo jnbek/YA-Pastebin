@@ -21,7 +21,7 @@ use Syntax::Highlight::Engine::Kate;
 use DBI;
 use Data::Dumper;
 
-our $version = '0.7-BETA';
+our $version = '0.9-v1.0-RC1';
 sub template_path {'./templates'}
 
 #sub post_navigate { debug shift->dump_history; }
@@ -29,6 +29,7 @@ sub main_hash_swap {
     my $self = shift;
     my $f    = $self->form;
     my $dbh  = $self->_dbh;
+    $self->_chk_tree;
     $self->_expire_pastes;
     my ($paste, $the_code);
     if ($f->{'p'}) {
@@ -267,7 +268,20 @@ sub _unix2date {
     $h->{'time'} = $time;
     return $h;
 }
-
+sub _chk_tree {
+    my $self = shift;
+    my $cfg  = $self->_config;
+    if (!-e $cfg->{'base_path'}) {
+        mkdir $cfg->{'base_path'} || die "Could not create ".$cfg->{'base_path'}." : $!";
+    }
+    if (!-e $cfg->{'base_path'}."/".$cfg->{'storage_path'}) {
+        mkdir $cfg->{'base_path'}."/".$cfg->{'storage_path'} ||
+            die "Could not create ".$cfg->{'base_path'}."/".$cfg->{'storage_path'}." : $!";
+    }
+    else {
+        return 0;
+    }
+}
 sub _hl_file {
     my $self = shift;
     my ($file, $type) = @_;
