@@ -21,7 +21,7 @@ use Syntax::Highlight::Engine::Kate;
 use DBI;
 use Data::Dumper;
 
-our $version = '0.9-v1.0-RC1';
+our $version = '0.9.5-v1.0-RC2';
 sub template_path {'./templates'}
 
 #sub post_navigate { debug shift->dump_history; }
@@ -38,7 +38,7 @@ sub main_hash_swap {
     my $cfg = $self->_config;
     my $hl  = new Syntax::Highlight::Engine::Kate();
     my $ext = $hl->extensions;
-    #debug $ext; #TODO: make this work better.
+    #$self->_dump $ext; #TODO: make this work better.
     my (@e, @ph, @recent_pastes);
     foreach my $l (values %$ext) {
         push @e, @$l;
@@ -108,7 +108,7 @@ sub main_finalize {
 
     # In case user has JS off dbl check filename.
     if (!$f->{'filename'} || length($f->{'filename'}) > 254) {
-        $self->add_to_errors({general_error => "Illegal Filename Provided. Please try again."});
+        $self->_dump({general_error => "Illegal Filename Provided. Please try again."});
         return 0;
     }
     my $paste_password;
@@ -123,8 +123,8 @@ sub main_finalize {
             $expires);
     };
     if ($@) {
-        $self->add_to_errors({general_error => $DBI::errstr});
-        debug $DBI::errstr;
+        $self->_dump({general_error => $DBI::errstr});
+        $self->_dump($DBI::errstr);
         return 0;
     }
     $dbh->disconnect;
@@ -171,8 +171,8 @@ sub _expire_pastes {
     my $now  = time;
     my $dir  = qq{$cfg->{'base_path'}/$cfg->{'storage_path'}};
 
-    #delete the actualy filename
-    opendir(my $dh, $dir) || debug "Can't open $dir: $!";
+    #delete the actual filename
+    opendir(my $dh, $dir) || $self->_dump("Can't open $dir: $!",{fatal => 1});
     while (my $file = readdir($dh)) {
         next if $file =~ m/^\./;
         my @stat      = stat("$dir/$file");
@@ -184,7 +184,7 @@ sub _expire_pastes {
 
             # If there's a file and no DB entry delete it too.
             if (!$ex->{'expires'} || $now >= $ex->{'expires'}) {
-                unlink "$dir/$file" || debug "Couldn't Remove $file: $!";
+                unlink "$dir/$file" || $self->_dump("Couldn't Remove $file: $!");
             }
         }
         $sth_exp = undef;
@@ -194,8 +194,8 @@ sub _expire_pastes {
     my $sth = $dbh->prepare($sql);
     eval { $sth->execute($now) };
     if ($@) {
-        debug $@;
-        $self->add_to_errors({general_error => $DBI::errstr});
+        $self->_dump($@);
+        $self->_dump({general_error => $DBI::errstr});
         return 0;
     }
     $sth = undef;
@@ -220,7 +220,7 @@ sub _dbh {
     my $dbport = $cfg->{'dbport'};
     my $dsn    = "dbi:mysql:database=$dbname;host=$dbhost;port=$dbport";
     my $dbh    = DBI->connect($dsn, $dbuser, $dbpass, {RaiseError => 1, AutoCommit => 1})
-      || debug $DBI::errstr;
+      || $self->_dump($DBI::errstr);
     return $dbh;
 }
 
@@ -246,9 +246,9 @@ sub _save_file {
     my $code      = shift;
     my $cfg       = $self->_config;
     my $directory = qq{$cfg->{'base_path'}/$cfg->{'storage_path'}};
-    debug "$directory doesn't exist. Please create it and continue" if !-e $directory;
-    debug "$directory isn't writable. Please correct this problem." if !-w $directory;
-    open my $FH, '>', "$directory/$file" || debug "Failed to open $directory/$file: $!";
+    $self->_dump("$directory doesn't exist. Please create it and continue") if !-e $directory;
+    $self->_dump("$directory isn't writable. Please correct this problem.") if !-w $directory;
+    open my $FH, '>', "$directory/$file" || $self->_dump("Failed to open $directory/$file: $!");
     print $FH $code;
     close($FH);
 
@@ -272,15 +272,25 @@ sub _chk_tree {
     my $self = shift;
     my $cfg  = $self->_config;
     if (!-e $cfg->{'base_path'}) {
-        mkdir $cfg->{'base_path'} || die "Could not create ".$cfg->{'base_path'}." : $!";
+        mkdir $cfg->{'base_path'} || $self->_dump(qq{Could not create $cfg->{'base_path'}: $!},{fatal => 1});
     }
     if (!-e $cfg->{'base_path'}."/".$cfg->{'storage_path'}) {
         mkdir $cfg->{'base_path'}."/".$cfg->{'storage_path'} ||
-            die "Could not create ".$cfg->{'base_path'}."/".$cfg->{'storage_path'}." : $!";
+            $self->_dump(qq{Could not create $cfg->{'base_path'}/$cfg->{'storage_path'}: $!},{fatal => 1});
     }
     else {
         return 0;
     }
+}
+sub _dump {
+    my $self = shift;
+    my @error = @_;
+    my $die = pop @error if ref $error[$#error] eq 'HASH';
+    debug @error;
+    if ($die->{'fatal'}){
+        exit(0);
+    }
+    return 0;
 }
 sub _hl_file {
     my $self = shift;
