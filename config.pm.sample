@@ -15,6 +15,7 @@ sub config {
         dbport       => 3306,
         base_path    => '/path/to/ya-pastebin',
         storage_path => 'pastes',        # No /'s
+        hash_id_size => 10,
     };
     return $cfg;
 }

@@ -7,7 +7,7 @@ package Ya::Pastebin;
 #  DESCRIPTION:  Yet Another Pastebin CGI-Ex style!!
 #
 #       AUTHOR:  John D Jones III (jnbek at yahoo dot com),
-#      VERSION:  0.2
+#      VERSION:  0.10
 #      CREATED:  03/29/2010 03:55:56 PM
 #===============================================================================
 
@@ -19,9 +19,8 @@ use CGI::Ex::Dump qw(debug);
 
 use Syntax::Highlight::Engine::Kate;
 use DBI;
-use Data::Dumper;
 
-our $version = '0.9.5-v1.0-RC2';
+our $VERSION = "0.10";
 sub template_path {'./templates'}
 
 #sub post_navigate { debug shift->dump_history; }
@@ -99,12 +98,11 @@ sub main_finalize {
     my $self = shift;
     my $f    = $self->form;
     my $t    = time;
-    use Time::HiRes qw(clock_gettime);
-    my $ms   = clock_gettime();
     my $sql  = $self->_query_db('insert');
     my $dbh  = $self->_dbh;
-    use Digest::SHA qw(sha1_hex sha512_hex);
-    my $hash_id = sha1_hex($ms); #Use Millisecs for more precision.
+    my $cfg = $self->_config;
+    use Digest::SHA qw(sha512_hex);
+    my $hash_id = $self->_gen_id($cfg->{'hash_id_size'});
 
     # In case user has JS off dbl check filename.
     if (!$f->{'filename'} || length($f->{'filename'}) > 254) {
@@ -150,7 +148,7 @@ sub _get_paste {
     my $dir  = qq{$cfg->{'base_path'}/$cfg->{'storage_path'}};
     my $sth  = $dbh->prepare($sql);
     $sth->execute($p);
-    my $paste = $sth->fetchrow_hashref;
+    my $paste = $sth->fetchrow_hashref || undef;
     $sth = undef;
     $dbh->disconnect;
 
@@ -201,6 +199,16 @@ sub _expire_pastes {
     $sth = undef;
     $dbh->disconnect;
     return 1;
+}
+
+sub _gen_id {
+    my $size   = shift;
+    my @an     = ('a' .. 'z', 'A' .. 'Z', 0 .. 9);
+    my $str = join '', (map { $an[rand @an] } @an)[0 .. $size];
+    if ($self->_get_paste($str)) {
+        $self->_gen_id($size);
+    }
+    return $str;
 }
 
 sub _config {
