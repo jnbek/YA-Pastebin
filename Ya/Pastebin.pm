@@ -7,7 +7,7 @@ package Ya::Pastebin;
 #  DESCRIPTION:  Yet Another Pastebin CGI-Ex style!!
 #
 #       AUTHOR:  John D Jones III (jnbek at yahoo dot com),
-#      VERSION:  0.10
+#      VERSION:  0.13
 #      CREATED:  03/29/2010 03:55:56 PM
 #===============================================================================
 
@@ -20,7 +20,7 @@ use CGI::Ex::Dump qw(debug);
 use Syntax::Highlight::Engine::Kate;
 use DBI;
 
-our $VERSION = "0.10";
+our $VERSION = "0.13";
 sub template_path {'./templates'}
 
 #sub post_navigate { debug shift->dump_history; }
@@ -69,9 +69,10 @@ sub main_hash_swap {
         hl_code       => $the_code,
         filename      => $paste->{'file'},
         language      => $paste->{'filetype'},
-        version       => $version,
+        version       => $VERSION,
         site_name     => $cfg->{'site_name'},
         site_slogan   => $cfg->{'site_slogan'},
+        year          => $self->_unix2date(time,1),
     };
 }
 
@@ -155,7 +156,7 @@ sub _get_paste {
     if ($paste->{'file'}) {
         $paste->{'code'} = do { local (@ARGV, $/) = qq{$dir/$paste->{'file'}}; <> };
     }
-    else {
+    else { #TODO: Let's not return a whitespace.
         $paste->{'code'} = ' ';
     }
     return $paste;
@@ -202,10 +203,11 @@ sub _expire_pastes {
 }
 
 sub _gen_id {
+    my $self   = shift;
     my $size   = shift;
     my @an     = ('a' .. 'z', 'A' .. 'Z', 0 .. 9);
     my $str = join '', (map { $an[rand @an] } @an)[0 .. $size];
-    if ($self->_get_paste($str)) {
+    if ($self->_get_paste($str)->{'code'} ne ' ') { #TODO: No Whitespace
         $self->_gen_id($size);
     }
     return $str;
@@ -267,9 +269,11 @@ sub _save_file {
 sub _unix2date {
     my $self = shift;
     my $unix = shift;    #UNIX Epoch
+    my $yr   = shift;    #pass for year only
     my $h    = {};
     my @months = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
     my ($sec, $min, $hour, $day, $month, $year) = (localtime($unix))[0, 1, 2, 3, 4, 5, 6];
+    return $year+1900 if $yr;
     my $date = "$day-$months[$month]-" . ($year + 1900);
     my $time = "$hour:$min:$sec";
     $h->{'date'} = $date;
