@@ -1,19 +1,19 @@
 /*
       Created by Keith Donegan of Code-Sucks.com
-	  
-	  E-Mail: Keithdonegan@gmail.com
-	  
-	  You can do whatever you want with these layouts,
-	  but it would be greatly appreciated if you gave a link
-	  back to http://www.code-sucks.com
-	  
+      
+      E-Mail: Keithdonegan@gmail.com
+      
+      You can do whatever you want with these layouts,
+      but it would be greatly appreciated if you gave a link
+      back to http://www.code-sucks.com
+      
 */
 
 * { padding: 0; margin: 0; }
 
 body {
- /*font-family: Arial, Helvetica, sans-serif;
- font-size: 13px;*/
+ font-family: sans-serif;
+ font-size: 13px;
 }
 #wrapper { 
  margin: 0 auto;
@@ -28,16 +28,16 @@ body {
  height: 48px;
  margin: 10px 0px 0px 0px;
  background: #EEEDDE;
- /*background-image: url('header.jpg');
- color: #FEFEFE;*/
+ background-image: url('images/bg-v2.png');
+ background-repeat:repeat-x;
 }
 #leftcolumn { 
  color: #333;
  border: 1px solid #ccc;
- background: #F2F2E6;
+ background: #F1F1F1;
  margin: 0px 0px 0px 0px;
  padding: 10px;
- min-height: 780px;
+ min-height: 500px;
  width: 778px;
  float: left;
 }
@@ -45,10 +45,10 @@ body {
  float: right;
  color: #333;
  border: 1px solid #ccc;
- background: #EEEDDE;
+ background: #F1F1F1;
  margin: 0px 0px 0px 0px;
  padding: 10px;
- min-height: 780px;
+ min-height: 500px;
  width: 200px;
  display: inline;
 }
@@ -59,8 +59,8 @@ body {
  background: #EEEDDE;
  margin: 0px 0px 10px 0px;
  padding: 10px;
- /*color: #FEFEFE;
- background-image: url('header.jpg');*/
+ background-image: url('images/bg-v2.png');
+ background-repeat:repeat-x;
 }
 
 /* Highlighting Classes */
