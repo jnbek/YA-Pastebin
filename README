@@ -5,7 +5,6 @@ A CGI::Ex driven pastebin designed for collaboration and code sharing.
     CGI::Ex
     Template::Alloy
     Digest::SHA
-    Time::HiRes (clock_gettime)
     Syntax::Highlight::Engine::Kate (Bundled)
     Any dependencies required by the above packages and their dependencies....
     Under FreeBSD use:
@@ -23,3 +22,10 @@ A CGI::Ex driven pastebin designed for collaboration and code sharing.
      cd ya-pastebin/
      vim config.pm
 
+* Credits
+
+Larry Wall for creating Perl
+Paul Seamons for CGI-Ex and being such a cool guy.
+Daniel Fackrell for needing this tool.
+Opeth for the awesome music.
+Butterpaws for being my wife and putting up with hours of coding.
