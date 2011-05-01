@@ -7,7 +7,7 @@ package Ya::Pastebin;
 #  DESCRIPTION:  Yet Another Pastebin CGI-Ex style!!
 #
 #       AUTHOR:  John D Jones III (jnbek at yahoo dot com),
-#      VERSION:  0.13
+#      VERSION:  0.14
 #      CREATED:  03/29/2010 03:55:56 PM
 #===============================================================================
 
@@ -17,11 +17,14 @@ use warnings;
 use base qw(CGI::Ex::App);
 use CGI::Ex::Dump qw(debug);
 
+use FindBin;
+our $base_path = $FindBin::RealBin;
+
 use Syntax::Highlight::Engine::Kate;
 use DBI;
 
-our $VERSION = "0.13";
-sub template_path {'./templates'}
+our $VERSION = "0.14";
+sub template_path {$base_path.'/templates'}
 
 #sub post_navigate { debug shift->dump_history; }
 sub main_hash_swap {
@@ -31,6 +34,7 @@ sub main_hash_swap {
     $self->_chk_tree;
     $self->_expire_pastes;
     my ($paste, $the_code);
+    delete $f->{'p'} if $f->{'p'} !~ m/[[:alnum:]]/g;
     if ($f->{'p'}) {
         $paste = $self->_get_paste($f->{'p'});
     }
@@ -140,6 +144,50 @@ sub success_run_step {
     return 1;
 }
 
+sub css_hash_swap {
+    my $self  = shift;
+    my $dir   = "$base_path/assets/css";
+    my @files = glob($dir . '/*.css');
+    my $content;
+    foreach my $file (@files) {
+        open my $FH, '<', $file || die $!;
+        while (<$FH>) {
+            $content .= $_;
+        }
+        close $FH;
+    }
+
+    $self->cgix->print_content_type('text/css');
+    return {css_content => $content};
+}
+
+sub javascript_hash_swap {
+    my $self  = shift;
+    my $dir   = "$base_path/assets/js";
+    my @files = glob($dir . '/*.js');
+    my $content;
+    foreach my $file (@files) {
+        open my $FH, '<', $file || die $!;
+        while (<$FH>) {
+            $content .= $_;
+        }
+        close $FH; 
+    }       
+
+    $self->cgix->print_content_type('application/x-javascript');
+    return {js_content => $content};
+}
+
+sub css_file_print {
+    my $css = qq{[% css_content %]};
+    return \$css;
+}
+
+sub javascript_file_print {
+    my $js = qq{[% js_content %]};
+    return \$js;
+}
+
 sub _get_paste {
     my $self = shift;
     my $p    = shift;
@@ -156,8 +204,8 @@ sub _get_paste {
     if ($paste->{'file'}) {
         $paste->{'code'} = do { local (@ARGV, $/) = qq{$dir/$paste->{'file'}}; <> };
     }
-    else { #TODO: Let's not return a whitespace.
-        $paste->{'code'} = ' ';
+    else {
+        $paste->{'code'} = undef;
     }
     return $paste;
 }
@@ -207,7 +255,7 @@ sub _gen_id {
     my $size   = shift;
     my @an     = ('a' .. 'z', 'A' .. 'Z', 0 .. 9);
     my $str = join '', (map { $an[rand @an] } @an)[0 .. $size];
-    if ($self->_get_paste($str)->{'code'} ne ' ') { #TODO: No Whitespace
+    if ($self->_get_paste($str)->{'code'}) {
         $self->_gen_id($size);
     }
     return $str;

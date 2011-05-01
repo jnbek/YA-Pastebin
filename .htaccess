@@ -1,2 +1,16 @@
 Options +Indexes +ExecCGI +FollowSymLinks
 DirectoryIndex ya.pl
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-d 
+RewriteCond %{REQUEST_FILENAME} !-f 
+RewriteCond %{REQUEST_FILENAME} !-l 
+RewriteRule ^stylesheets\.css/?$ ya.pl?step=css
+RewriteRule ^javascripts\.js/?$ ya.pl?step=javascript 
+RewriteRule ^images/(.*)$ assets/images/$1 
+RewriteRule ^sitepics/(.*)$ assets/sitepics/$1 
+
+<ifModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/html
+</ifModule>

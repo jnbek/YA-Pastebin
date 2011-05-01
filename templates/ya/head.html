@@ -1,26 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE html>
+<html>
     <head profile="http://www.w3.org/2000/08/w3c-synd/#">
-        <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        [%- IF filename %]
         <title>[% filename %]: [% site_name %]</title>
+        [%- ELSE %]
+        <title>[% site_name %]</title>
+        [%- END %]
         <base href="[% base_href %]" />
-        <script type="text/javascript" src="assets/ibox.js"></script>
-        <!--script type="text/javascript" src="http://www.google.com/jsapi?key=ABQIAAAAZU8ny8b8l-OXNJXo5o9mRRQVkxwpkSi1iDn5tWNjdX3_3wsBGhTpMzuhsARENKCNPYGTzM-4odinDg"></script>
-        <script type="text/javascript">
-            google.load("jquery", "1");
-            //google.load("jqueryui", "1");
-            //google.load("swfobject", "2");
-            //swfobject.embedSWF(base_path[0].href+"assets/header.swf", "header", "475", "120", "9.0.0");
-        </script-->
+        <link type="text/css" rel="stylesheet" href="stylesheets.css" />
+        <script type="text/javascript" src="javascripts.js"></script>
         <script type="text/javascript">
             <!--
             iBox.default_width = '100%';
             var base_path = document.getElementsByTagName("base");
             //-->
         </script>
-        <link type="text/css" rel="stylesheet" href="assets/main.css" />
-        <link type="text/css" rel="stylesheet" href="assets/aal.css" />
-        <link rel="stylesheet" href="assets/lightbox.css" type="text/css" 
-        media="screen"/>
     </head>
