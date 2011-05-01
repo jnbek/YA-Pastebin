@@ -28,7 +28,7 @@ body {
  height: 48px;
  margin: 10px 0px 0px 0px;
  background: #EEEDDE;
- background-image: url('images/bg-v2.png');
+ background-image: url('images/head-bg.gif');
  background-repeat:repeat-x;
 }
 #leftcolumn { 
@@ -40,6 +40,8 @@ body {
  min-height: 500px;
  width: 778px;
  float: left;
+ background-image: url('images/main-bg.gif');
+ background-repeat:repeat-y;
 }
 #rightcolumn { 
  float: right;
@@ -51,6 +53,8 @@ body {
  min-height: 500px;
  width: 200px;
  display: inline;
+ background-image: url('images/column-bg.gif');
+ background-repeat:repeat-y;
 }
 #footer { 
  width: 1000px;
@@ -59,7 +63,7 @@ body {
  background: #EEEDDE;
  margin: 0px 0px 10px 0px;
  padding: 10px;
- background-image: url('images/bg-v2.png');
+ background-image: url('images/foot-bg.gif');
  background-repeat:repeat-x;
 }
 
