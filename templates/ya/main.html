@@ -25,13 +25,13 @@
               <label for="filename"> Name: </label>
             </td>
             <td>
-              <input type="text" name="filename" value="[% filename %]" />
+              <input type="text" id="filename" name="filename" value="[% filename %]" />
             </td>
             <td>
               <label for="language"> Language: </label>
             </td>
             <td>
-              <select name="language">
+              <select id="language" name="language">
                 [%- FOR l in langs %]
                 <option value="[% l%]" [% l == language ? 'selected="selected"' : '' %]>[% l %]</option>
                 [%- END %]
@@ -43,13 +43,13 @@
               <!--label for="password"> Password (Optional): </label-->&nbsp;
             </td>
             <td>
-              <!--input type="password" name="password" /-->&nbsp;
+              <!--input type="password" id="password" name="password" /-->&nbsp;
             </td>
             <td>
               <label for="expires"> Expires: </label>
             </td>
             <td>
-              <select name="expires">
+              <select id="expires" name="expires">
                 <option value="1200">20 Minutes</option>
                 <option value="3600">1 Hour</option>
                 <option value="86400" selected="selected">24 Hours</option>
@@ -63,7 +63,7 @@
           </tr>
         </table>
         [%- IF code %]
-        <p><a rel="ibox&fullscreen=true" href="#inner_content">View Highlighted Code</a></p>
+        <p><a rel="ibox&amp;fullscreen=true" href="#inner_content">View Highlighted Code</a></p>
         <div id="inner_content" style="display:none;">
           <div style="background:#eeeeee;border:1px dashed #aaaaaa;padding:15px;margin:15px;">
           <pre>[% hl_code %]</pre>
@@ -74,7 +74,7 @@
         </script>
         [%- END %]
         <label for="the_code"> Code: </label><br />
-        <textarea name="the_code" cols="80" rows="20">[% code %]</textarea>
+        <textarea id="the_code" name="the_code" cols="80" rows="20">[% code %]</textarea>
         <br />
         <input type="submit" name="submit" />
       </form>
@@ -94,6 +94,7 @@
         Expires: [% r.expires %]<br />
         </li>
         [%-END %]
+        </ul>
       </div>
       <!-- End Right Column -->
 
@@ -109,4 +110,3 @@
     [% js_validation %]   
   </body>
 </html>
-
