@@ -15,6 +15,9 @@ body {
  font-family: sans-serif;
  font-size: 13px;
 }
+pre {
+    line-height: 1.1em;
+}
 #wrapper { 
  margin: 0 auto;
  width: 1022px;
