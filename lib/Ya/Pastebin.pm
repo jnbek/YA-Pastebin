@@ -17,9 +17,6 @@ use warnings;
 use base qw(CGI::Ex::App);
 use CGI::Ex::Dump qw(debug);
 
-#use FindBin;
-#our $base_path = $FindBin::RealBin;
-
 use Syntax::Highlight::Engine::Kate;
 use DBI;
 use config;
