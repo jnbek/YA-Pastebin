@@ -10,7 +10,7 @@ perl:
 before-script:
   - cpan -fi Template::Alloy CGI::Ex
 
-script: "./ya.pl"
+script: "perl cgi-bin/ya"
 os:
   - linux
   - osx
