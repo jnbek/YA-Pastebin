@@ -7,7 +7,7 @@ perl:
   - "5.12"
   - "5.10"
 
-install: "cpanm -fi Template::Alloy CGI::Ex perl cgi-bin/ya"
+install: "curl -L https://cpanmin.us | perl - --sudo App::cpanminus; cpanm -fi Template::Alloy CGI::Ex; perl cgi-bin/ya"
 os:
   - linux
   - osx
