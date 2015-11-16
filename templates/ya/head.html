@@ -7,13 +7,14 @@
         [%- ELSE %]
         <title>[% site_name %]</title>
         [%- END %]
-        <base href="[% base_href %]" />
-        <link type="text/css" rel="stylesheet" href="stylesheets.css" />
-        <script type="text/javascript" src="javascripts.js"></script>
+        <base href="[% base_href %]">
+        <link type="text/css" rel="stylesheet" href="[% script_name %]/css" />
+        <script type="text/javascript" src="[% script_name %]/javascript"></script>
         <script type="text/javascript">
             <!--
             iBox.default_width = '100%';
             var base_path = document.getElementsByTagName("base");
+            iBox.base_url = '[% assets_url %]';
             //-->
         </script>
     </head>

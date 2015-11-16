@@ -17,14 +17,18 @@ use warnings;
 use base qw(CGI::Ex::App);
 use CGI::Ex::Dump qw(debug);
 
-use FindBin;
-our $base_path = $FindBin::RealBin;
-
 use Syntax::Highlight::Engine::Kate;
 use DBI;
-
+use config;
 our $VERSION = "0.14";
-sub template_path {$base_path.'/templates'}
+sub template_path {shift->_config->{'base_path'}.'/templates'}
+
+sub path_info_map {
+    return [
+        [qr{^/([A-Z-a-z-0-9--]+)/([A-Z-a-z-0-9--]+)$}, 'step', 'params'],
+        [qr{^/([A-Z-a-z-0-9--]+)$}, 'step'],
+    ];
+}
 
 #sub post_navigate { debug shift->dump_history; }
 sub main_hash_swap {
@@ -77,6 +81,7 @@ sub main_hash_swap {
         site_name     => $cfg->{'site_name'},
         site_slogan   => $cfg->{'site_slogan'},
         year          => $self->_unix2date(time,1),
+        assets_url    => $cfg->{'assets_url'},
     };
 }
 
@@ -146,7 +151,8 @@ sub success_run_step {
 
 sub css_hash_swap {
     my $self  = shift;
-    my $dir   = "$base_path/assets/css";
+    my $cfg   = $self->_config;
+    my $dir   = "$cfg->{'base_path'}/assets/css";
     my @files = glob($dir . '/*.css');
     my $content;
     foreach my $file (@files) {
@@ -163,7 +169,8 @@ sub css_hash_swap {
 
 sub javascript_hash_swap {
     my $self  = shift;
-    my $dir   = "$base_path/assets/js";
+    my $cfg   = $self->_config;
+    my $dir   = "$cfg->{'base_path'}/assets/js";
     my @files = glob($dir . '/*.js');
     my $content;
     foreach my $file (@files) {
