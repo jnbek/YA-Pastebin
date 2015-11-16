@@ -7,7 +7,7 @@ perl:
   - "5.12"
   - "5.10"
 
-install: "curl -L https://cpanmin.us | perl - --sudo App::cpanminus; sudo cpanm --installdeps -fi DBI CGI::Ex; perl cgi-bin/ya"
+install: "curl -L https://cpanmin.us | perl - --sudo App::cpanminus; cpanm --installdeps -fi DBI CGI::Ex; perl -I./lib cgi-bin/ya"
 os:
   - linux
   - osx
