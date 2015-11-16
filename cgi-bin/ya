@@ -8,7 +8,9 @@ index.pl: Basic Loader for Ya::Pastebin
 
 use strict;
 use warnings;
-use Ya::Pastebin;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+use base qw(Ya::Pastebin);
 
 Ya::Pastebin->navigate;
 exit;

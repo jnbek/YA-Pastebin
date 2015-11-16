@@ -16,6 +16,7 @@ sub config {
         base_path    => '/path/to/ya-pastebin',
         storage_path => 'pastes',        # No /'s
         hash_id_size => 10,
+        assets_url   => '/assets/'
     };
     return $cfg;
 }

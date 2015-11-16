@@ -1,16 +1,13 @@
-Options +Indexes +ExecCGI +FollowSymLinks
-DirectoryIndex ya.pl
-RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-d 
-RewriteCond %{REQUEST_FILENAME} !-f 
-RewriteCond %{REQUEST_FILENAME} !-l 
-RewriteRule ^stylesheets\.css/?$ ya.pl?step=css
-RewriteRule ^javascripts\.js/?$ ya.pl?step=javascript 
-RewriteRule ^images/(.*)$ assets/images/$1 
-RewriteRule ^sitepics/(.*)$ assets/sitepics/$1 
-
-<ifModule mod_deflate.c>
+DirectoryIndex cgi-bin/ya
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-l
+    RewriteRule (.*) /cgi-bin/$1 [QSA,L,PT,E]
+</IfModule>
+<IfModule mod_deflate.c>
     AddOutputFilterByType DEFLATE application/x-javascript
     AddOutputFilterByType DEFLATE text/css
     AddOutputFilterByType DEFLATE text/html
-</ifModule>
+</IfModule>
