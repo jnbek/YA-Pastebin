@@ -9,7 +9,7 @@ perl:
 before-install:
   - cpan -fi Template::Alloy CGI::Ex
 
-install: "perl ya.pl"
+install: "pwd; perl ya.pl"
 os:
   - linux
   - osx
