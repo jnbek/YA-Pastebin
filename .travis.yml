@@ -1,6 +1,5 @@
 language: perl
 perl:
-  - "5.22"
   - "5.20"
   - "5.18"
   - "5.16"
@@ -10,7 +9,7 @@ perl:
 before-install:
   - cpan -fi Template::Alloy CGI::Ex
 
-install: "./ya.pl"
+install: "perl ya.pl"
 os:
   - linux
   - osx
