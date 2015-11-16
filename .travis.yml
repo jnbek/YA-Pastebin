@@ -6,10 +6,8 @@ perl:
   - "5.14"
   - "5.12"
   - "5.10"
-before-install:
-  - cpan -fi Template::Alloy CGI::Ex
 
-install: "cpan -fi Template::Alloy CGI::Ex perl cgi-bin/ya"
+install: "cpanm -fi Template::Alloy CGI::Ex perl cgi-bin/ya"
 os:
   - linux
   - osx
