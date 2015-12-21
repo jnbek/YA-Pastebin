@@ -45,7 +45,6 @@ sub main_hash_swap {
     my $cfg = $self->_config;
     my $hl  = new Syntax::Highlight::Engine::Kate();
     my $ext = $hl->extensions;
-    #$self->_dump $ext; #TODO: make this work better.
     my (@e, @ph, @recent_pastes);
     foreach my $l (values %$ext) {
         push @e, @$l;
@@ -115,8 +114,8 @@ sub main_finalize {
     my $hash_id = $self->_gen_id($cfg->{'hash_id_size'});
 
     # In case user has JS off dbl check filename.
-    if (!$f->{'filename'} || length($f->{'filename'}) > 254) {
-        $self->_dump({general_error => "Illegal Filename Provided. Please try again."});
+    if (!$f->{'filename'} || length($f->{'filename'}) > 254 || $f->{'filename'} =~ m/[^a-zA-Z0-9\s]/) {
+        $self->add_to_errors({general_error => "Illegal Filename Provided. Please try again."});
         return 0;
     }
     my $paste_password;
@@ -131,8 +130,7 @@ sub main_finalize {
             $expires);
     };
     if ($@) {
-        $self->_dump({general_error => $DBI::errstr});
-        $self->_dump($DBI::errstr);
+        $self->add_to_errors({general_error => $DBI::errstr});
         return 0;
     }
     $dbh->disconnect;
@@ -178,8 +176,8 @@ sub javascript_hash_swap {
         while (<$FH>) {
             $content .= $_;
         }
-        close $FH; 
-    }       
+        close $FH;
+    }
 
     $self->cgix->print_content_type('application/x-javascript');
     return {js_content => $content};
@@ -198,6 +196,7 @@ sub javascript_file_print {
 sub _get_paste {
     my $self = shift;
     my $p    = shift;
+    $p =~ s/[^a-zA-Z0-9]//g;
     my $sql  = $self->_query_db('get_paste');
     my $dbh  = $self->_dbh;
     my $cfg  = $self->_config;
@@ -226,7 +225,7 @@ sub _expire_pastes {
     my $dir  = qq{$cfg->{'base_path'}/$cfg->{'storage_path'}};
 
     #delete the actual filename
-    opendir(my $dh, $dir) || $self->_dump("Can't open $dir: $!",{fatal => 1});
+    opendir(my $dh, $dir) || $self->add_to_errors({general_error => "Can't open $dir: $!"});
     while (my $file = readdir($dh)) {
         next if $file =~ m/^\./;
         my @stat      = stat("$dir/$file");
@@ -238,7 +237,7 @@ sub _expire_pastes {
 
             # If there's a file and no DB entry delete it too.
             if (!$ex->{'expires'} || $now >= $ex->{'expires'}) {
-                unlink "$dir/$file" || $self->_dump("Couldn't Remove $file: $!");
+                unlink "$dir/$file" || $self->add_to_errors({general_error => "Couldn't Remove $file: $!"});
             }
         }
         $sth_exp = undef;
@@ -248,8 +247,7 @@ sub _expire_pastes {
     my $sth = $dbh->prepare($sql);
     eval { $sth->execute($now) };
     if ($@) {
-        $self->_dump($@);
-        $self->_dump({general_error => $DBI::errstr});
+        $self->add_to_errors({general_error => $DBI::errstr});
         return 0;
     }
     $sth = undef;
@@ -285,7 +283,7 @@ sub _dbh {
     my $dbport = $cfg->{'dbport'};
     my $dsn    = "dbi:mysql:database=$dbname;host=$dbhost;port=$dbport";
     my $dbh    = DBI->connect($dsn, $dbuser, $dbpass, {RaiseError => 1, AutoCommit => 1})
-      || $self->_dump($DBI::errstr);
+      || $self->add_to_errors({general_error => $DBI::errstr});
     return $dbh;
 }
 
@@ -311,9 +309,9 @@ sub _save_file {
     my $code      = shift;
     my $cfg       = $self->_config;
     my $directory = qq{$cfg->{'base_path'}/$cfg->{'storage_path'}};
-    $self->_dump("$directory doesn't exist. Please create it and continue") if !-e $directory;
-    $self->_dump("$directory isn't writable. Please correct this problem.") if !-w $directory;
-    open my $FH, '>', "$directory/$file" || $self->_dump("Failed to open $directory/$file: $!");
+    $self->add_to_errors({general_error => "$directory doesn't exist. Please create it and continue"}) if !-e $directory;
+    $self->add_to_errors({general_error => "$directory isn't writable. Please correct this problem."}) if !-w $directory;
+    open my $FH, '>', "$directory/$file" || $self->add_to_errors({general_error => "Failed to open $directory/$file: $!"});
     print $FH $code;
     close($FH);
 
@@ -339,26 +337,17 @@ sub _chk_tree {
     my $self = shift;
     my $cfg  = $self->_config;
     if (!-e $cfg->{'base_path'}) {
-        mkdir $cfg->{'base_path'} || $self->_dump(qq{Could not create $cfg->{'base_path'}: $!},{fatal => 1});
+        mkdir $cfg->{'base_path'} || $self->add_to_errors({general_error => qq{Could not create $cfg->{'base_path'}: $!}});
     }
     if (!-e $cfg->{'base_path'}."/".$cfg->{'storage_path'}) {
         mkdir $cfg->{'base_path'}."/".$cfg->{'storage_path'} ||
-            $self->_dump(qq{Could not create $cfg->{'base_path'}/$cfg->{'storage_path'}: $!},{fatal => 1});
+            $self->add_to_errors({general_error => qq{Could not create $cfg->{'base_path'}/$cfg->{'storage_path'}: $!}});
     }
     else {
         return 0;
     }
 }
-sub _dump {
-    my $self = shift;
-    my @error = @_;
-    my $die = pop @error if ref $error[$#error] eq 'HASH';
-    debug @error;
-    if ($die->{'fatal'}){
-        exit(0);
-    }
-    return 0;
-}
+
 sub _hl_file {
     my $self = shift;
     my ($file, $type) = @_;
