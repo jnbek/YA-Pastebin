@@ -143,7 +143,7 @@ sub main_finalize {
 
 sub success_run_step {
     my $self = shift;
-    $self->goto_step('main');
+    $self->cgix->location_bounce("?p=$self->{'form'}->{'p'}");
     return 1;
 }
 
