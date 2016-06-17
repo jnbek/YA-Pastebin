@@ -37,7 +37,8 @@
             <td>
               <select id="language" name="language">
                 [%- FOR l in langs %]
-                <option value="[% l%]" [% l == language ? 'selected="selected"' : '' %]>[% l %]</option>
+                [% NEXT IF l.match(/(de|en)_(US|DE)/) %]
+                <option value="[% l %]" [% (language && l == language) || (!language && l eq 'Perl') ? 'selected="selected"' : '' %]>[% l %]</option>
                 [%- END %]
               </select>
             </td>
@@ -68,6 +69,7 @@
         </table>
         [%- IF code %]
         <p><a rel="ibox&amp;fullscreen=true" href="#inner_content">View Highlighted Code</a></p>
+        <p><a href="/raw/?p=[% p %]">View Raw Code</a></p>
         <div id="inner_content" style="display:none;">
           <div style="background:#eeeeee;border:1px dashed #aaaaaa;padding:15px;margin:15px;">
           <pre>[% hl_code %]</pre>
@@ -111,6 +113,6 @@
 
     </div>
     <!-- End Wrapper -->
-    [% js_validation %]   
+    [% js_validation %]
   </body>
 </html>
