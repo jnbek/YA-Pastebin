@@ -1,10 +1,11 @@
 DirectoryIndex cgi-bin/ya
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-l
-    RewriteRule (.*) /cgi-bin/$1 [QSA,L,PT,E]
+    RewriteRule (.*) /cgi-bin/ya/$1 [QSA,L,PT,E]
 </IfModule>
 <IfModule mod_deflate.c>
     AddOutputFilterByType DEFLATE application/x-javascript

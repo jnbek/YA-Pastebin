@@ -25,8 +25,8 @@ sub template_path {shift->_config->{'base_path'}.'/templates'}
 
 sub path_info_map {
     return [
-        [qr{^/([A-Z-a-z-0-9--]+)/([A-Z-a-z-0-9--]+)$}, 'step', 'params'],
-        [qr{^/([A-Z-a-z-0-9--]+)$}, 'step'],
+        [qr{^/([A-Z-a-z-0-9--]+)/([A-Z-a-z-0-9--]+)$}, 'step', 'p'],
+        [qr{^/([A-Z-a-z-0-9--]+)$}, 'p'],
     ];
 }
 
@@ -163,6 +163,22 @@ sub css_hash_swap {
 
     $self->cgix->print_content_type('text/css');
     return {css_content => $content};
+}
+
+sub raw_hash_swap {
+    my $self = shift;
+    return {
+        paste => 'No paste found.',
+    } if !$self->{'form'}->{'p'};
+    my $paste = $self->_get_paste($self->{'form'}->{'p'});
+    $self->cgix->print_content_type('text/plain');
+    return {
+        paste => $paste->{'code'},
+    };
+}
+
+sub raw_file_print {
+    \'[% paste %]';
 }
 
 sub javascript_hash_swap {
